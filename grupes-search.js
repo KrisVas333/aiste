@@ -96,7 +96,7 @@
     var shown = (out.grupes || out.grupes_ta_diena || []).length;
     out.santrauka = "Mieste " + city + " tinkamų grupių: " + m.length + " (su laisvomis vietomis: " + out.tinkamu_su_laisvomis_vietomis + ")" +
       (dk ? ", iš jų " + DAY_NAME[dk] + ": " + md.length : "") + ". Čia parodyta: " + shown + ".";
-    out.pastaba = "Pradėk nuo santraukos skaičiaus. Sakyk tik šias grupes. Laiką ir kainą sakyk skaitmenimis tiksliai kaip čia. Jei tinkamu_grupiu daugiau nei parodyta, pasakyk tikslų skaičių ir paklausk dienos ar rajono. Kodų neskaityk.";
+    out.pastaba = "Pradėk nuo santraukos skaičiaus. Pasakyk daugiausia 2 iš šių grupių (replika iki 60 žodžių). Laiką ir kainą rašyk skaitmenimis tiksliai kaip čia. Jei tinkamu_grupiu daugiau nei pasakei: „Yra dar N, pasakykit dieną ar rajoną.“ Kodų neskaityk.";
     return out;
   }
   var api = { search: search, findCity: findCity, norm: norm };

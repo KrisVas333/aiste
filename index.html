@@ -167,7 +167,7 @@ body.embed .chat{height:100vh;min-height:0;border:0;border-radius:0;box-shadow:n
         <dt>Ko nedaro</dt>
         <dd>Nesprendžia dėl sąskaitų, grąžinimų, išimčių; nenutraukia sutarčių; nemato paskyrų; nerenka duomenų; nerikiuoja būrelių. Tokiais atvejais parodo RA komandos kontaktus. Jei kalba vaikas, mandagiai baigia pokalbį.</dd>
         <dt>Testai</dt>
-        <dd id="tests-line">Simuliacijos v1.3, AIstis / AIstė: grupių paieška <strong>9/10 · 9/10</strong> (0 išgalvotų grupių), kraštiniai atvejai <strong>9/10 · 8/10</strong>, Aukšės klausimai <strong>3/5 · 3/5</strong>, gramatinė giminė <strong>0 klaidų</strong>. Dažniausia klaida: pasako „matote kontaktus“, bet kortelės neparodo, todėl puslapis ją parodo pats. Tikrų tėvų pokalbių dar nebuvo.</dd>
+        <dd id="tests-line">Simuliacijos v1.3b (po 100 personų testo pataisų), AIstis / AIstė: etalono neatitiko <strong>3/28 · 5/28</strong>, perdavimas žmogui temose, kur jo reikia, <strong>7/9 · 7/9</strong>, pirmas sakinys <strong>29 · 25 žodžiai</strong> (buvo 55 · 49), 0 išgalvotų grupių, 0 gimininių klaidų. Kai AI pasako „matote kontaktus“, bet kortelės neparodo, puslapis ją parodo pats. Tikrų tėvų pokalbių dar nebuvo.</dd>
         <dt>Kaina ⚠️ įvertis</dt>
         <dd>Balsu ≈ 0,10 $/min (≈ 1 $ už 10 min pokalbį). Tekstu pigiau: balso sintezės nėra. Telefonu + Twilio LT linija ≈ 0,17–0,19 $/min. Tikri skaičiai bus po pirmos savaitės.</dd>
         <dt>Grįžtamasis ryšys</dt>
@@ -196,11 +196,10 @@ body.embed .chat{height:100vh;min-height:0;border:0;border-radius:0;box-shadow:n
     vyras:   { zemesnis: "8ZwcV9ne6SKWl9oEI63s", iprastas: "UobNtYFTcCUxlYZA6j6J", aukstesnis: "i7EJApuFEXSWsVxfzPVE" },
     moteris: { zemesnis: "spva38LHSC1iGWiwmKfl", iprastas: "Jcun8DWznZPS4nGQWcUI", aukstesnis: "ABdd8ned2xJ34xg4Jbta" }
   };
-  var TAIL = "Gerinam Robotikos Akademijos klientų aptarnavimą: kai mokom vaikus apie dirbtinį intelektą, norim ir patys parodyti gerą jo panaudojimo pavyzdį. Esu čia, kad padėčiau, o jei bus sudėtinga, jumis pasirūpins žmogus iš mūsų komandos. Apie ką norėtumėt pasikalbėti?";
-  var FIRST = {
-    vyras_kris: "Labas! Čia Aistis, Robotikos Akademijos AI asistentas. Kalbu Kris'o, Robotikos Akademijos bendraįkūrėjo, balso AI kopija, ne pats Kris. " + TAIL,
-    vyras_sukurtas: "Labas! Čia Aistis, Robotikos Akademijos AI asistentas, dirbtinis intelektas su sukurtu balsu. " + TAIL,
-    moteris_sukurtas: "Labas! Čia Aistė, Robotikos Akademijos AI asistentė, dirbtinis intelektas su sukurtu balsu. " + TAIL
+  var FIRST = { // keep identical to build-aiste.py FIRST (v1.3b, <=30 / <=25 words)
+    vyras_kris: "Labas! Čia Aistis, Kris'o, bendraįkūrėjo, balso AI kopija, ne pats Kris. Gerinam aptarnavimą: mokom vaikus apie AI, tad rodom gerą pavyzdį. Prireikus padės žmogus iš komandos. Kuo galiu padėti?",
+    vyras_sukurtas: "Labas! Čia Aistis, Robotikos Akademijos AI asistentas su sukurtu balsu. Gerinam aptarnavimą: mokom vaikus apie AI, tad rodom gerą pavyzdį. Prireikus padės žmogus iš komandos. Kuo galiu padėti?",
+    moteris_sukurtas: "Labas! Čia Aistė, Robotikos Akademijos AI asistentė. Gerinam aptarnavimą: mokom vaikus apie AI, tad rodom gerą pavyzdį. Prireikus padės žmogus iš komandos. Kuo galiu padėti?"
   };
   var BALSAS = {
     kris: "Tavo balsas: Kris'o (Robotikos Akademijos bendraįkūrėjo) balso AI kopija. Tu ne Kris. Jei klausia „ar čia Kris?“, sakyk: ne, esu AI asistentas, kalbu Kris'o balso AI kopija.",
@@ -302,7 +301,7 @@ body.embed .chat{height:100vh;min-height:0;border:0;border-radius:0;box-shadow:n
     return dataReady.then(function(D){
       if (!D || !D.length || !window.AisteSearch) return JSON.stringify({rezultatas: "klaida", pastaba: "Katalogas neįsikėlė. Pasiūlyk registracijos puslapį ir RA komandos kontaktus."});
       var res = window.AisteSearch.search(D, p || {});
-      var list = (res.grupes_ta_diena || res.grupes || []).concat(res.kitos_dienos_pavyzdziai || []).slice(0, 3);
+      var list = (res.grupes_ta_diena || res.grupes || []).concat(res.kitos_dienos_pavyzdziai || []).slice(0, 2);
       list.forEach(function(g){ hold(groupCard(g)); });
       return JSON.stringify(res);
     });
