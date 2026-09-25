@@ -325,14 +325,24 @@ body.embed .chat{height:100vh;min-height:0;border:0;border-radius:0;box-shadow:n
     b.textContent = role === "ai" ? display(text) : text;
     if (via) b.appendChild(el("span", {"class":"via"}, via));
     history.push({r: role, t: text, via: via || ""});
-    add(b);
+    if (role !== "ai" || b.textContent.trim()) add(b);
     if (role === "ai") {
+      rescueLeakedTools(text);
       flush();
       if (postPending) postPending();
       // safety net: the agent says contacts are shown but did not call perduoti_zmogui → show the card anyway
       if (/matote[^.!?]{0,40}kontakt|kontaktus matote/i.test(text) && !handoffTurn) setTimeout(function(){ if (!handoffTurn) { showHandoff({tema: "kita", santrauka: ""}, text); flush(); } }, 2500);
     } else handoffTurn = false;
     return b;
+  }
+  // gpt-4.1-mini sometimes WRITES a tool call as text instead of calling it. The text is hidden by display(); here we run it.
+  function rescueLeakedTools(text){
+    var re = /(?:functions\.)?(rodyti_nuoroda|perduoti_zmogui)\s*\(([\s\S]*?)\)/g, m;
+    while ((m = re.exec(String(text || "")))) {
+      var args = m[2], get = function(k){ var r = new RegExp(k + '\\s*[:=]\\s*"\\s*([^"]*)"').exec(args); return r ? r[1].trim() : ""; };
+      if (m[1] === "rodyti_nuoroda" && get("url")) showLink({label: get("label"), url: get("url")});
+      if (m[1] === "perduoti_zmogui" && !handoffTurn) showHandoff({tema: get("tema") || "kita", santrauka: get("santrauka")}, text);
+    }
   }
   function sys(text){ add(el("p", {"class":"sys"}, text)); }
   function welcome(){
@@ -457,7 +467,7 @@ body.embed .chat{height:100vh;min-height:0;border:0;border-radius:0;box-shadow:n
   document.querySelectorAll("[data-g]").forEach(function(b){ b.addEventListener("click", function(){ choose("g", b.dataset.g); }); });
   document.querySelectorAll("[data-t]").forEach(function(b){ b.addEventListener("click", function(){ choose("t", b.dataset.t); }); });
   paint(); welcome();
-  window.AISTIS = { send: send, state: state, history: function(){ return history; } };
+  window.AISTIS = { send: send, state: state, history: function(){ return history; }, _agentSays: function(t){ bubble("ai", t); } }; // _agentSays: local QA only
 })();
 </script>
 </body>
