@@ -263,7 +263,8 @@ body.embed .chat{height:100vh;min-height:0;border:0;border-radius:0;box-shadow:n
   }
   function lastOf(role){ for (var i = history.length - 1; i >= 0; i--) if (history[i].r === role && !history[i].welcome && !history[i].local) return history[i].t; return ""; }
   function short(t, n){ if (t.length <= n) return t; var c = t.slice(0, n), i = c.lastIndexOf(". "); return (i > 80 ? c.slice(0, i + 1) : c.replace(/\s+\S*$/, "")) + " …"; }
-  var handoffTurn = false;
+  var handoffTurn = false, postPending = null, postTimer = null;
+  function postToParent(d){ try { if (window.parent !== window) window.parent.postMessage(d, location.origin); } catch(e) {} }
   function showHandoff(p){
     handoffTurn = true;
     var key = String((p && p.tema) || "kita").toLowerCase().trim();
@@ -278,7 +279,11 @@ body.embed .chat{height:100vh;min-height:0;border:0;border-radius:0;box-shadow:n
     box.appendChild(acts);
     box.appendChild(el("p", {"class":"hours"}, "Telefonu atsako darbo dienomis (I–V) 9:00–18:00."));
     hold(box);
-    try { if (window.parent !== window) window.parent.postMessage({type: "aistis-handoff", tema: topic, santrauka: String((p && p.santrauka) || "").slice(0, 200), klausimas: lastOf("me").slice(0, 300), atsakymas: short(display(lastOf("ai")), 280), asistentas: nameUI()}, location.origin); } catch(e) {}
+    // tell the parent page (integracija.html mock inbox); wait for this turn's words so "Ką atsakė" is filled
+    var q = lastOf("me"), before = lastOf("ai");
+    clearTimeout(postTimer);
+    postPending = function(){ postPending = null; clearTimeout(postTimer); var a = lastOf("ai"); postToParent({type: "aistis-handoff", tema: topic, santrauka: String((p && p.santrauka) || "").slice(0, 200), klausimas: q.slice(0, 300), atsakymas: a !== before ? short(display(a), 280) : "", asistentas: nameUI()}); };
+    postTimer = setTimeout(function(){ if (postPending) postPending(); }, 6000);
     return "Kontaktų kortelė parodyta pokalbyje.";
   }
   function groupCard(g){
@@ -323,6 +328,7 @@ body.embed .chat{height:100vh;min-height:0;border:0;border-radius:0;box-shadow:n
     add(b);
     if (role === "ai") {
       flush();
+      if (postPending) postPending();
       // safety net: the agent says contacts are shown but did not call perduoti_zmogui → show the card anyway
       if (/matote[^.!?]{0,40}kontakt|kontaktus matote/i.test(text) && !handoffTurn) setTimeout(function(){ if (!handoffTurn) { showHandoff({tema: "kita", santrauka: ""}); flush(); } }, 2500);
     } else handoffTurn = false;
@@ -420,7 +426,7 @@ body.embed .chat{height:100vh;min-height:0;border:0;border-radius:0;box-shadow:n
     showHandoff({tema: "kita", santrauka: "Tėvas pokalbyje paspaudė „Kalbėti su žmogumi“."});
     bubble("me", "Noriu kalbėti su žmogumi."); history[history.length - 1].local = true;
     add(el("div", {"class":"msg ai"}, "Žinoma. Štai RA komandos kontaktai: jie atsako darbo dienomis nuo 9 iki 18 val."));
-    flush();
+    flush(); if (postPending) postPending();
   });
 
   // ---------- testing ground ----------
