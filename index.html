@@ -54,7 +54,7 @@ a{color:var(--red)}
 .who b{display:block;font:800 16px/1.2 var(--mono);letter-spacing:.03em}
 .who span{font-size:13px;opacity:.85}
 .human{min-height:40px;padding:6px 10px;border-radius:var(--r);border:1px solid rgba(255,255,255,.5);background:transparent;color:#fff;font:600 14px/1.2 var(--body);cursor:pointer}
-.thread{flex:1;overflow-y:auto;padding:14px 12px;display:flex;flex-direction:column;gap:10px;background:var(--ground);scroll-behavior:smooth}
+.thread{position:relative;flex:1;overflow-y:auto;padding:14px 12px;display:flex;flex-direction:column;gap:10px;background:var(--ground);scroll-behavior:smooth}
 .consent{font-size:13px;color:var(--muted);text-align:center;margin:0 8px 4px}
 .msg{max-width:86%;padding:10px 13px;border-radius:14px;font-size:17px;line-height:1.5;white-space:pre-wrap;word-wrap:break-word}
 .msg.ai{align-self:flex-start;background:var(--bubble);border-bottom-left-radius:4px}
@@ -71,7 +71,7 @@ a{color:var(--red)}
 .card .small{font-size:14px;color:var(--muted)}
 .card .full{color:var(--red);font-weight:700}
 .card .reg{margin-top:6px;display:flex;align-items:center;justify-content:center;min-height:44px;border-radius:var(--r);background:var(--red);color:#fff;text-decoration:none;font-weight:700}
-.chip{align-self:flex-start;display:inline-flex;align-items:center;gap:8px;min-height:44px;padding:8px 12px;border-radius:var(--r);border:2px solid var(--red);color:var(--red);background:var(--ground);text-decoration:none;font-weight:600;font-size:16px}
+.chip{align-self:flex-start;max-width:100%;display:inline-flex;align-items:center;gap:8px;min-height:44px;padding:8px 12px;line-height:1.3;border-radius:var(--r);border:2px solid var(--red);color:var(--red);background:var(--ground);text-decoration:none;font-weight:600;font-size:16px}
 .chip::after{content:"↗";font-family:var(--mono)}
 .handoff{align-self:stretch;border:2px solid var(--red);border-radius:var(--r);padding:12px;background:var(--ground)}
 .handoff h3{font:800 16px/1.3 var(--mono);margin:0 0 2px}
@@ -262,6 +262,7 @@ body.embed .chat{height:100vh;min-height:0;border:0;border-radius:0;box-shadow:n
     return "Nuoroda parodyta pokalbyje.";
   }
   function lastOf(role){ for (var i = history.length - 1; i >= 0; i--) if (history[i].r === role && !history[i].welcome && !history[i].local) return history[i].t; return ""; }
+  function short(t, n){ if (t.length <= n) return t; var c = t.slice(0, n), i = c.lastIndexOf(". "); return (i > 80 ? c.slice(0, i + 1) : c.replace(/\s+\S*$/, "")) + " …"; }
   var handoffTurn = false;
   function showHandoff(p){
     handoffTurn = true;
@@ -277,7 +278,7 @@ body.embed .chat{height:100vh;min-height:0;border:0;border-radius:0;box-shadow:n
     box.appendChild(acts);
     box.appendChild(el("p", {"class":"hours"}, "Telefonu atsako darbo dienomis (I–V) 9:00–18:00."));
     hold(box);
-    try { if (window.parent !== window) window.parent.postMessage({type: "aistis-handoff", tema: topic, santrauka: String((p && p.santrauka) || "").slice(0, 200), klausimas: lastOf("me").slice(0, 300), atsakymas: display(lastOf("ai")).slice(0, 400), asistentas: nameUI()}, location.origin); } catch(e) {}
+    try { if (window.parent !== window) window.parent.postMessage({type: "aistis-handoff", tema: topic, santrauka: String((p && p.santrauka) || "").slice(0, 200), klausimas: lastOf("me").slice(0, 300), atsakymas: short(display(lastOf("ai")), 280), asistentas: nameUI()}, location.origin); } catch(e) {}
     return "Kontaktų kortelė parodyta pokalbyje.";
   }
   function groupCard(g){
@@ -323,7 +324,7 @@ body.embed .chat{height:100vh;min-height:0;border:0;border-radius:0;box-shadow:n
     if (role === "ai") {
       flush();
       // safety net: the agent says contacts are shown but did not call perduoti_zmogui → show the card anyway
-      if (/matote RA komandos kontaktus|kontaktus matote/i.test(text) && !handoffTurn) setTimeout(function(){ if (!handoffTurn) { showHandoff({tema: "kita", santrauka: ""}); flush(); } }, 2500);
+      if (/matote[^.!?]{0,40}kontakt|kontaktus matote/i.test(text) && !handoffTurn) setTimeout(function(){ if (!handoffTurn) { showHandoff({tema: "kita", santrauka: ""}); flush(); } }, 2500);
     } else handoffTurn = false;
     history.push({r: role, t: text, via: via || ""});
     return b;
