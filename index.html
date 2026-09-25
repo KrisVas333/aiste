@@ -265,7 +265,7 @@ body.embed .chat{height:100vh;min-height:0;border:0;border-radius:0;box-shadow:n
   function short(t, n){ if (t.length <= n) return t; var c = t.slice(0, n), i = c.lastIndexOf(". "); return (i > 80 ? c.slice(0, i + 1) : c.replace(/\s+\S*$/, "")) + " …"; }
   var handoffTurn = false, postPending = null, postTimer = null;
   function postToParent(d){ try { if (window.parent !== window) window.parent.postMessage(d, location.origin); } catch(e) {} }
-  function showHandoff(p){
+  function showHandoff(p, answeredText){
     handoffTurn = true;
     var key = String((p && p.tema) || "kita").toLowerCase().trim();
     var topic = TOPICS[key] || "Klausimas";
@@ -280,10 +280,10 @@ body.embed .chat{height:100vh;min-height:0;border:0;border-radius:0;box-shadow:n
     box.appendChild(el("p", {"class":"hours"}, "Telefonu atsako darbo dienomis (I–V) 9:00–18:00."));
     hold(box);
     // tell the parent page (integracija.html mock inbox); wait for this turn's words so "Ką atsakė" is filled
-    var q = lastOf("me"), before = lastOf("ai");
+    var q = lastOf("me"), before = answeredText ? null : lastOf("ai");
     clearTimeout(postTimer);
     postPending = function(){ postPending = null; clearTimeout(postTimer); var a = lastOf("ai"); postToParent({type: "aistis-handoff", tema: topic, santrauka: String((p && p.santrauka) || "").slice(0, 200), klausimas: q.slice(0, 300), atsakymas: a !== before ? short(display(a), 280) : "", asistentas: nameUI()}); };
-    postTimer = setTimeout(function(){ if (postPending) postPending(); }, 6000);
+    postTimer = setTimeout(function(){ if (postPending) postPending(); }, answeredText ? 0 : 6000);
     return "Kontaktų kortelė parodyta pokalbyje.";
   }
   function groupCard(g){
@@ -325,14 +325,14 @@ body.embed .chat{height:100vh;min-height:0;border:0;border-radius:0;box-shadow:n
     var b = el("div", {"class":"msg " + role});
     b.textContent = role === "ai" ? display(text) : text;
     if (via) b.appendChild(el("span", {"class":"via"}, via));
+    history.push({r: role, t: text, via: via || ""});
     add(b);
     if (role === "ai") {
       flush();
       if (postPending) postPending();
       // safety net: the agent says contacts are shown but did not call perduoti_zmogui → show the card anyway
-      if (/matote[^.!?]{0,40}kontakt|kontaktus matote/i.test(text) && !handoffTurn) setTimeout(function(){ if (!handoffTurn) { showHandoff({tema: "kita", santrauka: ""}); flush(); } }, 2500);
+      if (/matote[^.!?]{0,40}kontakt|kontaktus matote/i.test(text) && !handoffTurn) setTimeout(function(){ if (!handoffTurn) { showHandoff({tema: "kita", santrauka: ""}, text); flush(); } }, 2500);
     } else handoffTurn = false;
-    history.push({r: role, t: text, via: via || ""});
     return b;
   }
   function sys(text){ add(el("p", {"class":"sys"}, text)); }
