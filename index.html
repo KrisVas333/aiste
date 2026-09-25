@@ -2,154 +2,248 @@
 <html lang="lt">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="robots" content="noindex,nofollow">
-<title>AIstė · RA AI asistentas</title>
-<meta name="description" content="Robotikos Akademijos AI asistento prototipas tėvams, Kris'o balso AI kopija: registracija, grupės visoje Lietuvoje, sąskaitos. Eksperimentinis, tik suaugusiems.">
+<title>AIstis · RA AI asistentas</title>
+<meta name="description" content="Robotikos Akademijos AI asistento prototipas tėvams: pokalbis tekstu arba balsu, grupės visoje Lietuvoje, registracija, sąskaitos. Eksperimentinis, tik suaugusiems.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@600;700;800&display=swap&subset=latin-ext" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@600;700;800&display=swap&subset=latin-ext" rel="stylesheet">
 <style>
 :root{
   --ground:#FFFFFF; --surface:#F7F7F5; --ink:#0A0A0A; --muted:#595959; --line:#E5E2DE;
-  --red:#D90429; --red-soft:#FFF1F3; --ok:#0B6E4F;
+  --red:#D90429; --red-soft:#FFF1F3; --ok:#0B6E4F; --bubble:#F1F0EE;
   --mono:'JetBrains Mono',ui-monospace,'SF Mono',Menlo,monospace;
   --body:Inter,-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;
   --r:4px;
 }
-@media (prefers-color-scheme:dark){:root.never-dark{
-  --ground:#0E0E0E; --surface:#171717; --ink:#F4F4F4; --muted:#B5B5B5; --line:#2E2E2E; --red:#FF4D6A; --red-soft:#2A1216; --ok:#5FD3A8;}}
-:root[data-theme="dark"]{--ground:#0E0E0E; --surface:#171717; --ink:#F4F4F4; --muted:#B5B5B5; --line:#2E2E2E; --red:#FF4D6A; --red-soft:#2A1216; --ok:#5FD3A8;}
 *{box-sizing:border-box}
 html{-webkit-text-size-adjust:100%}
 body{margin:0;background:var(--ground);color:var(--ink);font-family:var(--body);font-size:18px;line-height:1.6;letter-spacing:.01em}
-.wrap{max-width:720px;margin:0 auto;padding:24px 16px 120px}
+.wrap{max-width:720px;margin:0 auto;padding:14px 16px 64px}
 h1,h2,.label{font-family:var(--mono);font-weight:800;letter-spacing:.04em}
-h1{font-size:clamp(24px,6vw,34px);line-height:1.2;margin:8px 0 4px}
+h1{font-size:clamp(30px,8vw,40px);line-height:1.1;margin:4px 0 2px}
 h1 .ai{color:var(--red)}
-.sub{color:var(--muted);margin:0 0 16px}
-h2{font-size:15px;text-transform:uppercase;letter-spacing:.1em;margin:32px 0 12px}
+.sub{color:var(--muted);margin:0 0 10px;font-size:16px}
+h2{font-size:15px;text-transform:uppercase;letter-spacing:.1em;margin:28px 0 10px}
 .label{font-size:12px;text-transform:uppercase;letter-spacing:.14em;color:var(--red)}
-.note{background:var(--red-soft);border:1px solid var(--line);border-left:4px solid var(--red);border-radius:var(--r);padding:12px 14px;font-size:16px}
-.how{font-size:16px;color:var(--muted);margin:0 0 8px}
-.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:16px}
-#screen{min-height:64px;display:grid;gap:12px}
-#screen .empty{color:var(--muted);font-size:16px}
-.chip{display:inline-flex;align-items:center;gap:8px;min-height:48px;padding:10px 14px;border-radius:var(--r);border:2px solid var(--red);color:var(--red);background:var(--ground);text-decoration:none;font-weight:600}
+.note{background:var(--red-soft);border:1px solid var(--line);border-left:4px solid var(--red);border-radius:var(--r);padding:10px 14px;font-size:15px;margin:0 0 14px}
+.muted{color:var(--muted)}
+a{color:var(--red)}
+.link-int{display:inline-flex;align-items:center;gap:8px;min-height:48px;font-weight:700;text-decoration:none;border-bottom:2px solid var(--red)}
+
+/* Bandymų aikštelė */
+.lab{border:2px dashed var(--line);border-radius:var(--r);padding:10px 12px;margin:0 0 12px;background:var(--surface)}
+.lab .label{display:block;margin-bottom:8px}
+.seg{display:flex;gap:6px;flex-wrap:wrap;margin:2px 0 8px}
+.seg .t{font:700 13px/1 var(--mono);text-transform:uppercase;letter-spacing:.08em;width:100%;color:var(--muted)}
+.seg button{flex:1 1 0;min-height:44px;padding:6px 8px;border:2px solid var(--line);background:var(--ground);color:var(--ink);border-radius:var(--r);font:600 16px/1.2 var(--body);cursor:pointer}
+.seg button[aria-pressed="true"]{border-color:var(--red);background:var(--red);color:#fff}
+.active-voice{font-size:15px;margin:2px 0 0}
+.active-voice strong{font-weight:700}
+.tag{display:inline-block;font:700 12px/1.4 var(--mono);text-transform:uppercase;letter-spacing:.06em;padding:2px 6px;border-radius:var(--r);border:1px solid var(--ink)}
+.tag.kris{background:var(--ink);color:#fff}
+.honest{font-size:14px;color:var(--muted);margin:6px 0 0}
+.honest summary{cursor:pointer;min-height:32px;color:var(--ink);font-weight:600}
+
+/* Chat (Messenger) */
+.chat{border:1px solid var(--line);border-radius:12px;overflow:hidden;display:flex;flex-direction:column;height:min(82vh,720px);min-height:540px;background:var(--ground);box-shadow:0 8px 28px rgba(0,0,0,.08)}
+.chat-head{display:flex;align-items:center;gap:10px;padding:10px 12px;background:var(--ink);color:#fff}
+.avatar{flex:0 0 40px;height:40px;border-radius:50%;background:var(--red);color:#fff;display:grid;place-items:center;font:800 15px/1 var(--mono)}
+.who{flex:1;min-width:0}
+.who b{display:block;font:800 16px/1.2 var(--mono);letter-spacing:.03em}
+.who span{font-size:13px;opacity:.85}
+.human{min-height:40px;padding:6px 10px;border-radius:var(--r);border:1px solid rgba(255,255,255,.5);background:transparent;color:#fff;font:600 14px/1.2 var(--body);cursor:pointer}
+.thread{flex:1;overflow-y:auto;padding:14px 12px;display:flex;flex-direction:column;gap:10px;background:var(--ground);scroll-behavior:smooth}
+.consent{font-size:13px;color:var(--muted);text-align:center;margin:0 8px 4px}
+.msg{max-width:86%;padding:10px 13px;border-radius:14px;font-size:17px;line-height:1.5;white-space:pre-wrap;word-wrap:break-word}
+.msg.ai{align-self:flex-start;background:var(--bubble);border-bottom-left-radius:4px}
+.msg.me{align-self:flex-end;background:var(--red);color:#fff;border-bottom-right-radius:4px}
+.msg .via{display:block;font:600 11px/1.3 var(--mono);text-transform:uppercase;letter-spacing:.06em;opacity:.7;margin-top:4px}
+.sys{align-self:center;font-size:13px;color:var(--muted);text-align:center;max-width:92%}
+.typing{align-self:flex-start;background:var(--bubble);border-radius:14px;padding:12px 14px;display:flex;gap:5px}
+.typing i{width:8px;height:8px;border-radius:50%;background:#8a8a8a;animation:b 1.2s infinite}
+.typing i:nth-child(2){animation-delay:.15s}.typing i:nth-child(3){animation-delay:.3s}
+@keyframes b{0%,60%,100%{opacity:.3;transform:translateY(0)}30%{opacity:1;transform:translateY(-3px)}}
+.card{align-self:flex-start;width:min(100%,340px);border:1px solid var(--line);border-left:4px solid var(--red);border-radius:var(--r);padding:10px 12px;background:var(--ground);display:grid;gap:2px;font-size:15px}
+.card h3{font:700 16px/1.3 var(--body);margin:0}
+.card p{margin:0}
+.card .small{font-size:14px;color:var(--muted)}
+.card .full{color:var(--red);font-weight:700}
+.card .reg{margin-top:6px;display:flex;align-items:center;justify-content:center;min-height:44px;border-radius:var(--r);background:var(--red);color:#fff;text-decoration:none;font-weight:700}
+.chip{align-self:flex-start;display:inline-flex;align-items:center;gap:8px;min-height:44px;padding:8px 12px;border-radius:var(--r);border:2px solid var(--red);color:var(--red);background:var(--ground);text-decoration:none;font-weight:600;font-size:16px}
 .chip::after{content:"↗";font-family:var(--mono)}
-.handoff{border:2px solid var(--red);border-radius:var(--r);padding:16px;background:var(--ground)}
-.handoff h3{font:800 18px/1.3 var(--mono);margin:0 0 4px}
-.handoff .topic{color:var(--muted);font-size:15px;margin:0 0 12px}
-.handoff .actions{display:grid;gap:8px}
-.btn{display:flex;align-items:center;justify-content:center;gap:10px;min-height:52px;padding:10px 14px;border-radius:var(--r);font-weight:700;text-decoration:none;font-size:17px}
+.handoff{align-self:stretch;border:2px solid var(--red);border-radius:var(--r);padding:12px;background:var(--ground)}
+.handoff h3{font:800 16px/1.3 var(--mono);margin:0 0 2px}
+.handoff .topic{color:var(--muted);font-size:14px;margin:0 0 8px}
+.handoff .actions{display:grid;gap:6px}
+.btn{display:flex;align-items:center;justify-content:center;gap:8px;min-height:48px;padding:8px 12px;border-radius:var(--r);font-weight:700;text-decoration:none;font-size:16px}
 .btn.primary{background:var(--red);color:#fff}
 .btn.ghost{border:2px solid var(--line);color:var(--ink)}
-.hours{font-size:15px;color:var(--muted);margin:10px 0 0}
-.grp{border:1px solid var(--line);border-left:4px solid var(--red);border-radius:var(--r);padding:12px 14px;background:var(--ground);display:grid;gap:4px}
-.grp h3{font:700 17px/1.3 var(--body);margin:0}
-.grp p{margin:0;font-size:16px}
-.grp .tag{font-size:14px;color:var(--muted)}
-.grp .full{color:var(--red);font-weight:700}
-.first{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:12px 14px;font-size:16px;margin:0 0 12px}
-.data{font-size:14px;color:var(--muted);margin:8px 0 0}
-.examples{display:flex;flex-wrap:wrap;gap:8px}
-.examples button{min-height:48px;padding:8px 12px;border-radius:var(--r);border:1px solid var(--line);background:var(--ground);color:var(--ink);font:500 16px/1.3 var(--body);cursor:pointer;text-align:left}
-.examples button:active{border-color:var(--red)}
-#toast{position:fixed;left:16px;right:16px;bottom:96px;margin:auto;max-width:420px;background:var(--ink);color:var(--ground);padding:12px 14px;border-radius:var(--r);font-size:16px;opacity:0;transition:opacity .2s;pointer-events:none;text-align:center}
-#toast.show{opacity:1}
-dl{margin:0}
-dt{font-weight:700;margin-top:10px}
-dd{margin:0;color:var(--ink)}
-.muted{color:var(--muted)}
-footer{margin-top:40px;font-size:15px;color:var(--muted);border-top:1px solid var(--line);padding-top:16px}
-a{color:var(--red)}
+.handoff .hours{font-size:13px;color:var(--muted);margin:8px 0 0}
+.quick{display:flex;gap:6px;overflow-x:auto;padding:8px 10px 2px;border-top:1px solid var(--line);scrollbar-width:none}
+.quick::-webkit-scrollbar{display:none}
+.quick button{flex:0 0 auto;min-height:40px;max-width:260px;padding:6px 10px;border-radius:18px;border:1px solid var(--line);background:var(--surface);color:var(--ink);font:500 14px/1.25 var(--body);cursor:pointer;text-align:left;white-space:normal}
+.composer{display:flex;gap:8px;align-items:flex-end;padding:8px 10px calc(10px + env(safe-area-inset-bottom))}
+.composer textarea{flex:1;min-height:48px;max-height:120px;resize:none;border:2px solid var(--line);border-radius:22px;padding:11px 14px;font:400 17px/1.4 var(--body);color:var(--ink);background:var(--ground)}
+.composer textarea:focus{outline:none;border-color:var(--red)}
+.round{flex:0 0 48px;height:48px;border-radius:50%;border:2px solid var(--line);background:var(--ground);display:grid;place-items:center;cursor:pointer;font-size:20px;color:var(--ink)}
+.round.send{background:var(--red);border-color:var(--red);color:#fff}
+.round.mic[aria-pressed="true"]{background:var(--ink);border-color:var(--ink);color:#fff;animation:p 1.6s infinite}
+@keyframes p{0%{box-shadow:0 0 0 0 rgba(217,4,41,.45)}70%{box-shadow:0 0 0 10px rgba(217,4,41,0)}100%{box-shadow:0 0 0 0 rgba(217,4,41,0)}}
+.voicebar{display:none;align-items:center;justify-content:space-between;gap:8px;padding:8px 12px;background:var(--red-soft);border-top:1px solid var(--line);font-size:15px}
+.voicebar.on{display:flex}
+.voicebar button{min-height:40px;padding:6px 12px;border-radius:var(--r);border:2px solid var(--red);background:var(--ground);color:var(--red);font:700 15px/1 var(--body);cursor:pointer}
+
+dl{margin:0}dt{font-weight:700;margin-top:10px}dd{margin:0}
+.box{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:14px 16px;font-size:16px}
+footer{margin-top:32px;font-size:15px;color:var(--muted);border-top:1px solid var(--line);padding-top:14px}
 .visually-hidden{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
-@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+
+/* embed=1: only the messenger, full height (used inside integracija.html mock) */
+body.embed{background:transparent}
+body.embed .page-only{display:none!important}
+body.embed .wrap{padding:0;max-width:none}
+body.embed .chat{height:100vh;min-height:0;border:0;border-radius:0;box-shadow:none}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important;scroll-behavior:auto!important}}
 </style>
 </head>
 <body>
 <div class="wrap">
-  <div class="label">Prototipas · v1.2 · 2026-09-25</div>
-  <h1>A<span class="ai">I</span>stė, Robotikos Akademijos AI asistentas <span class="muted" style="font-weight:600">(prototipas)</span></h1>
-  <p class="sub">Kalba Kris'o balso AI kopija. Klauskite apie grupes jūsų mieste, registraciją, sąskaitas ar pateisinimus. Balsu arba tekstu.</p>
-
-  <p class="note" role="note">⚗️ <strong>AI · eksperimentinis · gali klysti · nemokamas · tik suaugusiems.</strong> Tai ne pats Kris, o jo balso AI kopija. Pokalbiai saugomi 7 d., garsas neįrašomas. Nesakykite vaiko vardo ar kitų asmens duomenų. Svarbius dalykus pasitikrinkite su RA komanda. Grįžtamasis ryšys laukiamas.</p>
-
-  <h2 id="kaip">1 · Kaip pradėti</h2>
-  <p class="how">Spauskite raudoną mygtuką apačioje dešinėje → „Kalbėti balsu“ (leiskite mikrofoną) arba rašykite į laukelį. Pirmiausia išgirsite:</p>
-  <p class="first">„Labas! Čia Kris'o, Robotikos Akademijos bendraįkūrėjo, balso AI kopija, ne pats Kris. Gerinam Robotikos Akademijos klientų aptarnavimą: kai mokom vaikus apie dirbtinį intelektą, norim ir patys parodyti gerą jo panaudojimo pavyzdį. Esu čia, kad padėčiau, o jei bus sudėtinga, jumis pasirūpins žmogus iš mūsų komandos. Apie ką norėtumėt pasikalbėti?“</p>
-
-  <h2 id="ekranas">2 · Ekrane</h2>
-  <div class="card" id="screen" aria-live="polite" aria-labelledby="ekranas">
-    <p class="empty">Čia atsiras rastos grupės, nuorodos ir RA komandos kontaktai.</p>
+  <div class="page-only">
+    <div class="label">Prototipas · v1.3 · tik suaugusiems</div>
+    <h1 id="h1">A<span class="ai">I</span>stis</h1>
+    <p class="sub" id="sub">Robotikos Akademijos AI asistentas. Rašykite arba spauskite 🎙️.</p>
+    <section class="lab" aria-labelledby="lab-t">
+      <span class="label" id="lab-t">🧪 Bandymų aikštelė</span>
+      <div class="seg" role="group" aria-label="Balsas">
+        <span class="t">Balsas</span>
+        <button type="button" data-g="vyras" aria-pressed="true">Vyras (Kris'o balsas)</button>
+        <button type="button" data-g="moteris" aria-pressed="false">Moteris</button>
+      </div>
+      <div class="seg" role="group" aria-label="Tonas">
+        <span class="t">Tonas</span>
+        <button type="button" data-t="zemesnis" aria-pressed="false">Žemesnis</button>
+        <button type="button" data-t="iprastas" aria-pressed="true">Įprastas</button>
+        <button type="button" data-t="aukstesnis" aria-pressed="false">Aukštesnis</button>
+      </div>
+      <p class="active-voice" id="active-voice" aria-live="polite"></p>
+      <details class="honest"><summary>Kaip veikia tonas?</summary>Tonas = kitas balsas, ne tas pats balsas pakeltas ar nuleistas (ElevenLabs gyvai tono nekeičia). Įprastas vyriškas = Kris'o balso AI kopija (su jo sutikimu). Visi kiti sukurti per Voice Design ir nėra jokio tikro žmogaus kopija. Balsą girdite tik paspaudę 🎙️; rašant atsakymai ateina tekstu.</details>
+    </section>
   </div>
 
-  <h2 id="klausimai">Ką galiu paklausti?</h2>
-  <p class="how">Paspauskite, ir klausimas nukopijuojamas, įklijuokite jį į pokalbio laukelį (arba tiesiog pasakykite balsu).</p>
-  <div class="examples" aria-labelledby="klausimai">
-    <button type="button">Šiauliuose, sūnus antrokas. Kokios grupės antradieniais?</button>
-    <button type="button">Gyvenam Šeduvoje, sūnus antrokas. Kada vyksta robotika?</button>
-    <button type="button">Utenoje, sūnus pirmokas. Ar yra grupė penktadieniais?</button>
-    <button type="button">Kalvarijoje, dukrai ketveri, lanko darželį. Kokia grupė?</button>
-    <button type="button">Vilniuje, sūnus penktokas. Kur vyksta BrAIn Club virtuali realybė?</button>
-    <button type="button">Klaipėdoje, dukra priešmokyklinukė. Ką siūlot?</button>
-    <button type="button">Kaune, dukra trečiokė. Ar yra grupė sekmadieniais?</button>
-    <button type="button">Gyvenam Kaišiadoryse, dukra pirmokė. Ar turit būrelį?</button>
-  </div>
-  <p class="data" id="data-line">Duomenys: ExoClass viešas Robotikos Akademijos grupių katalogas, atnaujinta 2026-09-25.</p>
+  <section class="chat" aria-label="Pokalbis su AI asistentu">
+    <header class="chat-head">
+      <div class="avatar" aria-hidden="true">AI</div>
+      <div class="who"><b id="who-name">AIstis</b><span id="who-status">AI asistentas · atsako iš karto</span></div>
+      <button type="button" class="human" id="human">Kalbėti su žmogumi</button>
+    </header>
+    <div class="thread" id="thread" aria-live="polite"></div>
+    <div class="voicebar" id="voicebar"><span id="voice-status">🎙️ Jungiuosi…</span><button type="button" id="voice-stop">Baigti balsu</button></div>
+    <div class="quick" id="quick" aria-label="Pavyzdiniai klausimai">
+      <button type="button">Utenoje, sūnus pirmokas. Ar yra grupė penktadieniais?</button>
+      <button type="button">Šiauliuose, sūnus antrokas. Kokios grupės antradieniais?</button>
+      <button type="button">Kalvarijoje, dukrai ketveri, lanko darželį. Kokia grupė?</button>
+      <button type="button">Kiek pateisinimų turime per mokslo metus?</button>
+      <button type="button">Gavau sąskaitą, ji per didelė. Pataisykit.</button>
+      <button type="button">Vilniuje, sūnus penktokas. Kur vyksta BrAIn Club virtuali realybė?</button>
+    </div>
+    <form class="composer" id="composer" autocomplete="off">
+      <label class="visually-hidden" for="input">Jūsų žinutė</label>
+      <textarea id="input" rows="1" placeholder="Parašykite klausimą…" enterkeyhint="send"></textarea>
+      <button type="button" class="round mic" id="mic" aria-pressed="false" aria-label="Kalbėti balsu" title="Kalbėti balsu">🎙️</button>
+      <button type="submit" class="round send" id="send" aria-label="Siųsti" title="Siųsti">➤</button>
+    </form>
+  </section>
 
-  <h2 id="komandai">Komandai</h2>
-  <div class="card">
-    <dl>
-      <dt>Ką žino</dt>
-      <dd>26 Aukšės klausimai-atsakymai (mokėjimai · registracija · pateisinimai · nutraukimas · būrelio eiga) + viešas robotikosakademija.lt (DUK, sutartis, kontaktai, registracijos puslapis) + <strong>visas viešas RA grupių katalogas iš ExoClass</strong>: 1 290 grupių, 213 miestų ir gyvenviečių (vieta, diena, laikas, kaina, laisvos vietos). Grupes ieško šiame puslapyje, ne spėja.</dd>
-      <dt>Ko nedaro</dt>
-      <dd>Nesprendžia dėl konkrečių sąskaitų, grąžinimų, išimčių; nenutraukia sutarčių; nemato paskyrų; nerenka jokių duomenų (nei vardo, nei telefono); nerikiuoja būrelių. Tokiais atvejais parodo RA komandos kontaktus. Jei kalba vaikas, mandagiai baigia pokalbį.</dd>
-      <dt>Testai</dt>
-      <dd id="tests-line">Simuliacijos v1.2 (Kris'o balsas): grupių paieška <strong>10/10</strong> (0 išgalvotų grupių), kraštiniai atvejai <strong>10/10</strong>, Aukšės klausimai <strong>4/5</strong>. Tikrų tėvų pokalbių dar nebuvo.</dd>
-      <dt>Kaina ⚠️ įvertis</dt>
-      <dd>Svetainėje (balsu ar tekstu): ≈ 0,10 $/min, t. y. <strong>≈ 1 $ už 10 min pokalbį</strong> (balso agentas ≈ 0,08 $ + LLM gpt-4.1-mini ≈ 0,022 $). Telefonu dar pridedama Twilio LT linija ≈ 0,09 $/min: <strong>≈ 0,17–0,19 $/min, ≈ 1,8 $ už 10 min</strong>. Creator planas: 275 min per mėnesį jau įskaičiuota. Tikri skaičiai bus po pirmos savaitės.</dd>
-      <dt>Grįžtamasis ryšys</dt>
-      <dd>Kas atsakė neteisingai, kas skambėjo keistai, ko trūksta → <a href="mailto:kristijonas.vasiliauskas@gmail.com?subject=AIst%C4%97%20atsiliepimas">parašykite Kris'ui</a>.</dd>
-    </dl>
+  <div class="page-only">
+    <p class="note" role="note" style="margin-top:14px">⚗️ <strong>AI · eksperimentinis · gali klysti · nemokamas · tik suaugusiems.</strong> Pokalbiai saugomi 7 d., garsas neįrašomas. Nesakykite vaiko vardo ar kitų asmens duomenų. Svarbius dalykus pasitikrinkite su RA komanda. Grįžtamasis ryšys laukiamas.</p>
+    <p><a class="link-int" href="integracija.html">Kaip atrodytų RA sistemoje →</a></p>
+    <h2 id="komandai">Komandai</h2>
+    <div class="box">
+      <dl>
+        <dt>Ką žino</dt>
+        <dd>26 Aukšės klausimai-atsakymai (mokėjimai · registracija · pateisinimai · nutraukimas · būrelio eiga) + viešas robotikosakademija.lt + <strong>visas viešas RA grupių katalogas iš ExoClass</strong> (<span id="data-n">1 290</span> grupių, 213 miestų ir gyvenviečių). Grupes ieško šiame puslapyje, ne spėja.</dd>
+        <dt>Ko nedaro</dt>
+        <dd>Nesprendžia dėl sąskaitų, grąžinimų, išimčių; nenutraukia sutarčių; nemato paskyrų; nerenka duomenų; nerikiuoja būrelių. Tokiais atvejais parodo RA komandos kontaktus. Jei kalba vaikas, mandagiai baigia pokalbį.</dd>
+        <dt>Testai</dt>
+        <dd id="tests-line">Simuliacijos v1.3, AIstis / AIstė: grupių paieška <strong>9/10 · 9/10</strong> (0 išgalvotų grupių), kraštiniai atvejai <strong>9/10 · 8/10</strong>, Aukšės klausimai <strong>3/5 · 3/5</strong>, gramatinė giminė <strong>0 klaidų</strong>. Dažniausia klaida: pasako „matote kontaktus“, bet kortelės neparodo, todėl puslapis ją parodo pats. Tikrų tėvų pokalbių dar nebuvo.</dd>
+        <dt>Kaina ⚠️ įvertis</dt>
+        <dd>Balsu ≈ 0,10 $/min (≈ 1 $ už 10 min pokalbį). Tekstu pigiau: balso sintezės nėra. Telefonu + Twilio LT linija ≈ 0,17–0,19 $/min. Tikri skaičiai bus po pirmos savaitės.</dd>
+        <dt>Grįžtamasis ryšys</dt>
+        <dd>Kas atsakė neteisingai, kas skambėjo keistai, ko trūksta → <a href="mailto:kristijonas.vasiliauskas@gmail.com?subject=AIstis%20atsiliepimas">parašykite Kris'ui</a>.</dd>
+      </dl>
+      <p class="muted" id="data-line" style="font-size:14px;margin:10px 0 0">Duomenys: ExoClass viešas Robotikos Akademijos grupių katalogas.</p>
+    </div>
+    <footer>
+      ⚗️ Eksperimentinis prototipas, sukurtas su AI. Gali klysti, tad svarbius dalykus pasitikrinkite su RA komanda. Nemokamas. Radote klaidą? <a href="mailto:kristijonas.vasiliauskas@gmail.com?subject=AIstis%20atsiliepimas">Parašykite</a>.<br>
+      Robotikos Akademija · <a href="https://robotikosakademija.lt/kontaktai/" rel="noopener">kontaktai</a> · +370 5 25 25 713
+    </footer>
   </div>
-
-  <footer>
-    ⚗️ Eksperimentinis prototipas, sukurtas su AI. Gali klysti, tad svarbius dalykus pasitikrinkite su RA komanda. Nemokamas. Radote klaidą? <a href="mailto:kristijonas.vasiliauskas@gmail.com?subject=AIst%C4%97%20atsiliepimas">Parašykite</a>.<br>
-    Robotikos Akademija · <a href="https://robotikosakademija.lt/kontaktai/" rel="noopener">kontaktai</a> · +370 5 25 25 713
-  </footer>
 </div>
 
-<div id="widget-slot"></div>
-<div id="toast" role="status"></div>
-
+<script src="grupes-search.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@elevenlabs/client@1.25.0/dist/lib.iife.js"></script>
 <script>
 (function(){
   "use strict";
-  var AGENT_ID = "agent_4301m3c252x4eva9rnz6f3tpbfxe"; // Kris'o balsas (Kraist). Moteriškas agentas nenaudojamas.
+  var EMBED = /[?&]embed=1\b/.test(location.search);
+  if (EMBED) document.body.classList.add("embed");
+
+  // ---------- voice matrix (keep in sync with build-aiste.py VOICES / FIRST / BALSAS_*) ----------
+  var AGENTS = { vyras: "agent_4301m3c252x4eva9rnz6f3tpbfxe", moteris: "agent_2801m3c2512mfbj8n22sdwt0pwek" };
+  var VOICES = {
+    vyras:   { zemesnis: "8ZwcV9ne6SKWl9oEI63s", iprastas: "UobNtYFTcCUxlYZA6j6J", aukstesnis: "i7EJApuFEXSWsVxfzPVE" },
+    moteris: { zemesnis: "spva38LHSC1iGWiwmKfl", iprastas: "Jcun8DWznZPS4nGQWcUI", aukstesnis: "ABdd8ned2xJ34xg4Jbta" }
+  };
+  var TAIL = "Gerinam Robotikos Akademijos klientų aptarnavimą: kai mokom vaikus apie dirbtinį intelektą, norim ir patys parodyti gerą jo panaudojimo pavyzdį. Esu čia, kad padėčiau, o jei bus sudėtinga, jumis pasirūpins žmogus iš mūsų komandos. Apie ką norėtumėt pasikalbėti?";
+  var FIRST = {
+    vyras_kris: "Labas! Čia Aistis, Robotikos Akademijos AI asistentas. Kalbu Kris'o, Robotikos Akademijos bendraįkūrėjo, balso AI kopija, ne pats Kris. " + TAIL,
+    vyras_sukurtas: "Labas! Čia Aistis, Robotikos Akademijos AI asistentas, dirbtinis intelektas su sukurtu balsu. " + TAIL,
+    moteris_sukurtas: "Labas! Čia Aistė, Robotikos Akademijos AI asistentė, dirbtinis intelektas su sukurtu balsu. " + TAIL
+  };
+  var BALSAS = {
+    kris: "Tavo balsas: Kris'o (Robotikos Akademijos bendraįkūrėjo) balso AI kopija. Tu ne Kris. Jei klausia „ar čia Kris?“, sakyk: ne, esu AI asistentas, kalbu Kris'o balso AI kopija.",
+    vyras_sukurtas: "Tavo balsas: sukurtas dirbtinio intelekto balsas, ne jokio tikro žmogaus balso kopija. Jei klausia „ar čia Kris?“ ar „ar tu žmogus?“, sakyk: ne, esu AI asistentas su sukurtu balsu.",
+    moteris_sukurtas: "Tavo balsas: sukurtas dirbtinio intelekto balsas, ne jokio tikro žmogaus balso kopija. Jei klausia „ar čia Kris?“ ar „ar tu žmogus?“, sakyk: ne, esu AI asistentė su sukurtu balsu."
+  };
+  var TONE_LT = { zemesnis: "žemesnis tonas", iprastas: "įprastas tonas", aukstesnis: "aukštesnis tonas" };
+  var state = { g: "vyras", t: "iprastas" };
+  try { var q = new URLSearchParams(location.search); if (q.get("g") in VOICES) state.g = q.get("g"); if (q.get("t") in TONE_LT) state.t = q.get("t"); } catch(e) {}
+
+  function isKris(){ return state.g === "vyras" && state.t === "iprastas"; }
+  function kind(){ return isKris() ? "kris" : state.g + "_sukurtas"; }
+  function firstMsg(){ return isKris() ? FIRST.vyras_kris : FIRST[state.g + "_sukurtas"]; }
+  function nameUI(){ return state.g === "vyras" ? "AIstis" : "AIstė"; }
+  function display(t){ // UI spelling + no em dashes + no stray [tags]
+    return String(t || "").replace(/\bAistis\b/g, "AIstis").replace(/\bAisčio\b/g, "AIsčio").replace(/\bAist(ė|ės|ei|ėje)(?![a-ząčęėįšųūž])/gi, function(m, s){ return "AIst" + s; })
+      .replace(/\s*—\s*/g, ", ").replace(/\[[a-z_ ]{2,20}\]\s*/gi, "")
+      .replace(/(functions\.)?(rodyti_nuoroda|perduoti_zmogui|ieskoti_grupiu|end_call)\s*\([\s\S]*?\)\)?\s*/g, "")   // tool call leaked as text
+      .replace(/\bEkrane matote\b/g, "Pokalbyje matote").replace(/\bekrane\b/g, "pokalbyje").trim();
+  }
+
+  // ---------- RA data + client tools ----------
   var DEEP = "https://embed.exoclass.com/lt/embed/provider/97e413ab-8700-4d9a-81aa-0b21cf4e916c/group-management/";
+  var ACCOUNT_PREFIX = "https://embed.exoclass.com/lt/embed/provider/97e413ab-8700-4d9a-81aa-0b21cf4e916c/";
   var DATA = null, KEYS = {};
   var dataReady = fetch("grupes.json", {cache: "no-cache"}).then(function(r){ return r.json(); }).then(function(d){
     DATA = d.groups; DATA.forEach(function(g){ KEYS[g[11]] = g[12]; });
-    var dl = document.getElementById("data-line");
-    if (dl && d.updated) dl.textContent = "Duomenys: ExoClass viešas Robotikos Akademijos grupių katalogas, atnaujinta " + d.updated + " (" + DATA.length + " grupės).";
+    var dl = document.getElementById("data-line"); if (dl && d.updated) dl.textContent = "Duomenys: ExoClass viešas Robotikos Akademijos grupių katalogas, atnaujinta " + d.updated + " (" + DATA.length + " grupės).";
+    var dn = document.getElementById("data-n"); if (dn) dn.textContent = DATA.length.toLocaleString("lt-LT");
     return DATA;
   }).catch(function(){ DATA = []; return DATA; });
-  var PHONE_TEL = "+37052525713", PHONE_SHOW = "+370 5 25 25 713";
-  var EMAIL = "info@robotikosakademija.lt";
-  var HOURS = "Telefonu atsako darbo dienomis (I–V) 9:00–18:00.";
+  var PHONE_TEL = "+37052525713", PHONE_SHOW = "+370 5 25 25 713", EMAIL = "info@robotikosakademija.lt";
   var TOPICS = {"sąskaita":"Sąskaita","saskaita":"Sąskaita","nutraukimas":"Sutarties nutraukimas","pateisinimas":"Pateisinimas","registracija":"Registracija","nvs":"NVŠ krepšelis","nvš":"NVŠ krepšelis","skundas":"Skundas","kita":"Klausimas"};
   var ALLOWED_HOST = /(^|\.)robotikosakademija\.lt$/;
-  var ACCOUNT_PREFIX = "https://embed.exoclass.com/lt/embed/provider/97e413ab-8700-4d9a-81aa-0b21cf4e916c/";
-  var screen = document.getElementById("screen");
 
-  function el(tag, attrs, text){
-    var n = document.createElement(tag);
-    if (attrs) for (var k in attrs) n.setAttribute(k, attrs[k]);
-    if (text != null) n.textContent = text;
-    return n;
-  }
-  function clearEmpty(){ var e = screen.querySelector(".empty"); if (e) e.remove(); }
+  var thread = document.getElementById("thread");
+  function el(tag, attrs, text){ var n = document.createElement(tag); if (attrs) for (var k in attrs) n.setAttribute(k, attrs[k]); if (text != null) n.textContent = text; return n; }
+  function scroll(){ thread.scrollTop = thread.scrollHeight; }
+  // Tool cards arrive before the agent's words for that turn. Hold them and show them right AFTER the next agent bubble (or after 4 s).
+  var held = [], heldTimer = null;
+  function hold(node){ held.push(node); clearTimeout(heldTimer); heldTimer = setTimeout(flush, 4000); }
+  function flush(){ clearTimeout(heldTimer); var h = held; held = []; h.forEach(function(n){ add(n); }); }
+  function add(node){ var ty = thread.querySelector(".typing"); if (ty) thread.insertBefore(node, ty); else thread.appendChild(node); scroll(); return node; }
   function safeUrl(u){
     try {
       var x = new URL(String(u));
@@ -164,79 +258,201 @@ a{color:var(--red)}
   function showLink(p){
     var url = safeUrl(p && p.url);
     if (!url) return "Nuoroda neleidžiama: rodomi tik robotikosakademija.lt puslapiai.";
-    clearEmpty();
-    var label = String((p && p.label) || "Atidaryti puslapį").slice(0, 60);
-    var a = el("a", {"class":"chip", href:url, target:"_blank", rel:"noopener"}, label);
-    screen.prepend(a);
-    return "Nuoroda parodyta ekrane.";
+    hold(el("a", {"class":"chip", href:url, target:"_blank", rel:"noopener"}, String((p && p.label) || "Atidaryti puslapį").slice(0, 60)));
+    return "Nuoroda parodyta pokalbyje.";
   }
+  function lastOf(role){ for (var i = history.length - 1; i >= 0; i--) if (history[i].r === role && !history[i].welcome && !history[i].local) return history[i].t; return ""; }
+  var handoffTurn = false;
   function showHandoff(p){
-    clearEmpty();
+    handoffTurn = true;
     var key = String((p && p.tema) || "kita").toLowerCase().trim();
     var topic = TOPICS[key] || "Klausimas";
-    var old = screen.querySelector(".handoff"); if (old) old.remove();
     var box = el("section", {"class":"handoff", "aria-label":"Susisiekite su RA komanda"});
     box.appendChild(el("h3", null, "Susisiekite su RA komanda"));
     box.appendChild(el("p", {"class":"topic"}, "Tema: " + topic));
     var acts = el("div", {"class":"actions"});
     acts.appendChild(el("a", {"class":"btn primary", href:"tel:" + PHONE_TEL}, "📞 Skambinti " + PHONE_SHOW));
-    var subject = encodeURIComponent("AIstė: " + topic);
-    acts.appendChild(el("a", {"class":"btn ghost", href:"mailto:" + EMAIL + "?subject=" + subject}, "✉️ Rašyti " + EMAIL));
-    acts.appendChild(el("a", {"class":"btn ghost", href:"https://robotikosakademija.lt/kontaktai/", target:"_blank", rel:"noopener"}, "💬 Rašyti į pokalbių langą svetainėje (Intercom)"));
+    acts.appendChild(el("a", {"class":"btn ghost", href:"mailto:" + EMAIL + "?subject=" + encodeURIComponent(nameUI() + ": " + topic)}, "✉️ Rašyti " + EMAIL));
+    acts.appendChild(el("a", {"class":"btn ghost", href:"https://robotikosakademija.lt/kontaktai/", target:"_blank", rel:"noopener"}, "💬 Pokalbių langas svetainėje"));
     box.appendChild(acts);
-    box.appendChild(el("p", {"class":"hours"}, HOURS));
-    screen.prepend(box);
-    return "Kontaktų kortelė parodyta ekrane.";
+    box.appendChild(el("p", {"class":"hours"}, "Telefonu atsako darbo dienomis (I–V) 9:00–18:00."));
+    hold(box);
+    try { if (window.parent !== window) window.parent.postMessage({type: "aistis-handoff", tema: topic, santrauka: String((p && p.santrauka) || "").slice(0, 200), klausimas: lastOf("me").slice(0, 300), atsakymas: display(lastOf("ai")).slice(0, 400), asistentas: nameUI()}, location.origin); } catch(e) {}
+    return "Kontaktų kortelė parodyta pokalbyje.";
   }
-  function showGroups(res){
-    var list = (res && (res.grupes_ta_diena || res.grupes)) || [];
-    var extra = (res && res.kitos_dienos_pavyzdziai) || [];
-    screen.querySelectorAll(".grp").forEach(function(n){ n.remove(); });
-    list.concat(extra).slice(0, 4).reverse().forEach(function(g){
-      clearEmpty();
-      var box = el("section", {"class":"grp"});
-      box.appendChild(el("h3", null, g.vieta));
-      box.appendChild(el("p", null, g.programa + " · " + g.trukme + " · " + g.amzius));
-      box.appendChild(el("p", null, g.laikas + " · " + g.kaina));
-      var st = el("p", {"class": g.vietos === "PILNA" ? "full" : "tag"}, g.vietos === "PILNA" ? "Grupė pilna" : g.vietos + (g.prasideda ? " · prasideda " + g.prasideda : ""));
-      box.appendChild(st);
-      if (g.tik_sios_istaigos_vaikams) box.appendChild(el("p", {"class":"tag"}, "Tik šios įstaigos vaikams"));
-      var url = safeUrl(g.nuoroda);
-      if (url) box.appendChild(el("a", {"class":"chip", href:url, target:"_blank", rel:"noopener"}, "Grupė ExoClass'e"));
-      screen.prepend(box);
-    });
+  function groupCard(g){
+    var box = el("section", {"class":"card"});
+    box.appendChild(el("h3", null, g.vieta));
+    box.appendChild(el("p", {"class":"small"}, g.programa + " · " + g.trukme + " · " + g.amzius));
+    box.appendChild(el("p", null, g.laikas));
+    box.appendChild(el("p", null, g.kaina));
+    box.appendChild(el("p", {"class": g.vietos === "PILNA" ? "full" : "small"}, g.vietos === "PILNA" ? "Grupė pilna" : g.vietos + (g.prasideda ? " · prasideda " + g.prasideda : "")));
+    if (g.tik_sios_istaigos_vaikams) box.appendChild(el("p", {"class":"small"}, "Tik šios įstaigos vaikams"));
+    var url = safeUrl(g.nuoroda);
+    if (url) box.appendChild(el("a", {"class":"reg", href:url, target:"_blank", rel:"noopener"}, "Registruotis ↗"));
+    return box;
   }
   function findGroups(p){
     return dataReady.then(function(D){
       if (!D || !D.length || !window.AisteSearch) return JSON.stringify({rezultatas: "klaida", pastaba: "Katalogas neįsikėlė. Pasiūlyk registracijos puslapį ir RA komandos kontaktus."});
       var res = window.AisteSearch.search(D, p || {});
-      showGroups(res);
+      var list = (res.grupes_ta_diena || res.grupes || []).concat(res.kitos_dienos_pavyzdziai || []).slice(0, 3);
+      list.forEach(function(g){ hold(groupCard(g)); });
       return JSON.stringify(res);
     });
   }
   var clientTools = { rodyti_nuoroda: showLink, perduoti_zmogui: showHandoff, ieskoti_grupiu: findGroups };
-  window.AISTE_TOOLS = clientTools; // for local QA only
+  window.AISTE_TOOLS = clientTools; // local QA only
 
-  (function mount(){
-    var w = document.createElement("elevenlabs-convai");
-    w.setAttribute("agent-id", AGENT_ID);
-    w.addEventListener("elevenlabs-convai:call", function(ev){ ev.detail.config.clientTools = clientTools; });
-    document.getElementById("widget-slot").appendChild(w);
-  })();
-
-  var toast = document.getElementById("toast"), tt;
-  function say(msg){ toast.textContent = msg; toast.classList.add("show"); clearTimeout(tt); tt = setTimeout(function(){ toast.classList.remove("show"); }, 2200); }
-  document.querySelectorAll(".examples button").forEach(function(b){
-    b.addEventListener("click", function(){
-      var t = b.textContent;
-      if (navigator.clipboard && navigator.clipboard.writeText) {
-        navigator.clipboard.writeText(t).then(function(){ say("Nukopijuota. Įklijuokite į pokalbio laukelį"); }, function(){ say("Paklauskite: „" + t + "“"); });
-      } else { say("Paklauskite: „" + t + "“"); }
+  // ---------- chat ----------
+  var history = [];          // {r:"me"|"ai", t, via}
+  var conv = null, connecting = null, mode = "text", pending = [], sid = 0;
+  var input = document.getElementById("input");
+  var typingOn = false;
+  function typing(on){
+    var ty = thread.querySelector(".typing");
+    if (on && !ty) { ty = el("div", {"class":"typing", "aria-label": nameUI() + " rašo"}); ty.innerHTML = "<i></i><i></i><i></i>"; thread.appendChild(ty); scroll(); }
+    if (!on && ty) ty.remove();
+    typingOn = on;
+  }
+  function bubble(role, text, via){
+    var b = el("div", {"class":"msg " + role});
+    b.textContent = role === "ai" ? display(text) : text;
+    if (via) b.appendChild(el("span", {"class":"via"}, via));
+    add(b);
+    if (role === "ai") {
+      flush();
+      // safety net: the agent says contacts are shown but did not call perduoti_zmogui → show the card anyway
+      if (/matote RA komandos kontaktus|kontaktus matote/i.test(text) && !handoffTurn) setTimeout(function(){ if (!handoffTurn) { showHandoff({tema: "kita", santrauka: ""}); flush(); } }, 2500);
+    } else handoffTurn = false;
+    history.push({r: role, t: text, via: via || ""});
+    return b;
+  }
+  function sys(text){ add(el("p", {"class":"sys"}, text)); }
+  function welcome(){
+    thread.innerHTML = "";
+    history = [];
+    thread.appendChild(el("p", {"class":"consent"}, "⚗️ AI, ne žmogus · eksperimentinis · gali klysti · nemokamas. Rašydami ar kalbėdami patvirtinate, kad esate suaugęs. Nesakykite vaiko vardo."));
+    var b = el("div", {"class":"msg ai welcome"}); b.textContent = display(firstMsg()); thread.appendChild(b);
+    history.push({r: "ai", t: firstMsg(), via: "", welcome: true});
+  }
+  function contextText(){
+    var h = history.filter(function(x){ return !x.welcome; }).slice(-8);
+    if (!h.length) return "";
+    return "Ankstesnė šio pokalbio dalis (tęsk nuo čia, nesisveikink iš naujo):\n" + h.map(function(x){ return (x.r === "me" ? "Tėvas: " : "Tu: ") + x.t; }).join("\n");
+  }
+  function startSession(voice){
+    if (connecting) return connecting;
+    mode = voice ? "voice" : "text";
+    var my = ++sid;
+    var hasTalk = history.some(function(x){ return x.r === "me"; });
+    var opts = {
+      agentId: AGENTS[state.g],
+      connectionType: "websocket",
+      textOnly: !voice,
+      overrides: {
+        agent: { firstMessage: voice && !hasTalk ? firstMsg() : "" },
+        tts: { voiceId: VOICES[state.g][state.t] }
+      },
+      dynamicVariables: { balsas: BALSAS[kind()] },
+      clientTools: clientTools,
+      onConnect: function(){},
+      onMessage: function(m){
+        if (my !== sid) return;
+        var role = m.role || (m.source === "ai" ? "agent" : "user");
+        var text = (m.message || "").trim(); if (!text) return;
+        if (role === "user") { if (mode === "voice") bubble("me", text, "🎙️ balsu"); return; }
+        if (mode === "voice" && !hasTalk) { var w = thread.querySelector(".welcome"); if (w && text === firstMsg()) return; }
+        typing(false);
+        bubble("ai", text, mode === "voice" ? "🔊 " + TONE_LT[state.t] : "");
+      },
+      onModeChange: function(m){ if (mode === "voice") document.getElementById("voice-status").textContent = m.mode === "speaking" ? "🔊 " + nameUI() + " kalba…" : "🎙️ Klausau, kalbėkite"; },
+      onError: function(msg){ if (my !== sid) return; typing(false); sys("⚠️ Ryšio klaida. Bandykite dar kartą arba skambinkite " + PHONE_SHOW + "."); if (window.console) console.warn("aistis error", msg); },
+      onDisconnect: function(d){
+        if (my !== sid) return;
+        var wasVoice = mode === "voice";
+        conv = null; connecting = null; typing(false); setVoiceUI(false);
+        if (d && d.reason === "agent") sys("Pokalbis baigtas. Galite parašyti iš naujo.");
+        else if (d && d.reason === "error") sys("⚠️ Ryšys nutrūko. Parašykite dar kartą.");
+        else if (wasVoice) sys("Balsu baigta. Galite tęsti rašydami.");
+      }
+    };
+    connecting = window.ElevenLabsClient.Conversation.startSession(opts).then(function(c){
+      if (my !== sid) { c.endSession(); return c; }
+      conv = c;
+      var ctx = contextText(); if (ctx) c.sendContextualUpdate(ctx);
+      while (pending.length) c.sendUserMessage(pending.shift());
+      return c;
+    }).catch(function(e){
+      if (my !== sid) throw e;
+      connecting = null; conv = null; typing(false); setVoiceUI(false);
+      sys(voice ? "⚠️ Nepavyko įjungti mikrofono ar prisijungti. Galite rašyti tekstu." : "⚠️ Nepavyko prisijungti. Bandykite dar kartą arba skambinkite " + PHONE_SHOW + ".");
+      if (window.console) console.warn("aistis start", e);
+      throw e;
     });
+    return connecting;
+  }
+  function send(text){
+    text = String(text || "").trim(); if (!text) return;
+    bubble("me", text, mode === "voice" ? "⌨️ tekstu" : "");
+    typing(true);
+    if (conv) conv.sendUserMessage(text);
+    else { pending.push(text); startSession(mode === "voice").catch(function(){}); }
+  }
+  document.getElementById("composer").addEventListener("submit", function(e){ e.preventDefault(); var t = input.value; input.value = ""; autosize(); send(t); });
+  input.addEventListener("keydown", function(e){ if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); document.getElementById("composer").requestSubmit(); } });
+  function autosize(){ input.style.height = "auto"; input.style.height = Math.min(input.scrollHeight, 120) + "px"; }
+  input.addEventListener("input", autosize);
+  document.querySelectorAll("#quick button").forEach(function(b){ b.addEventListener("click", function(){ send(b.textContent); }); });
+
+  // voice in the same chat
+  var mic = document.getElementById("mic");
+  function setVoiceUI(on){ mic.setAttribute("aria-pressed", on ? "true" : "false"); document.getElementById("voicebar").classList.toggle("on", on); if (!on) mode = "text"; }
+  function stopVoice(){ var c = conv; sid++; conv = null; connecting = null; if (c) c.endSession(); setVoiceUI(false); sys("Balsu baigta. Galite tęsti rašydami."); }
+  mic.addEventListener("click", function(){
+    if (mode === "voice") { stopVoice(); return; }
+    var go = function(){ setVoiceUI(true); mode = "voice"; document.getElementById("voice-status").textContent = "🎙️ Jungiuosi…"; startSession(true).catch(function(){}); };
+    if (conv) { var c = conv; sid++; conv = null; connecting = null; Promise.resolve(c.endSession()).then(go, go); } else go();
   });
+  document.getElementById("voice-stop").addEventListener("click", stopVoice);
+  document.getElementById("human").addEventListener("click", function(){
+    showHandoff({tema: "kita", santrauka: "Tėvas pokalbyje paspaudė „Kalbėti su žmogumi“."});
+    bubble("me", "Noriu kalbėti su žmogumi."); history[history.length - 1].local = true;
+    add(el("div", {"class":"msg ai"}, "Žinoma. Štai RA komandos kontaktai: jie atsako darbo dienomis nuo 9 iki 18 val."));
+    flush();
+  });
+
+  // ---------- testing ground ----------
+  function paint(){
+    document.querySelectorAll("[data-g]").forEach(function(b){ b.setAttribute("aria-pressed", String(b.dataset.g === state.g)); });
+    document.querySelectorAll("[data-t]").forEach(function(b){ b.setAttribute("aria-pressed", String(b.dataset.t === state.t)); });
+    var n = nameUI();
+    document.getElementById("who-name").textContent = n;
+    document.getElementById("who-status").textContent = (state.g === "vyras" ? "AI asistentas" : "AI asistentė") + " · atsako iš karto";
+    document.getElementById("h1").innerHTML = 'A<span class="ai">I</span>st' + (state.g === "vyras" ? "is" : "ė");
+    document.getElementById("sub").textContent = "Robotikos Akademijos AI " + (state.g === "vyras" ? "asistentas" : "asistentė") + ". Rašykite arba spauskite 🎙️.";
+    document.title = n + " · RA AI " + (state.g === "vyras" ? "asistentas" : "asistentė");
+    var av = document.getElementById("active-voice");
+    av.innerHTML = "";
+    av.appendChild(document.createTextNode("Dabar: "));
+    av.appendChild(el("strong", null, n));
+    av.appendChild(document.createTextNode(" · " + TONE_LT[state.t] + " · "));
+    av.appendChild(el("span", {"class": "tag" + (isKris() ? " kris" : "")}, isKris() ? "Kris'o balso AI kopija" : "sukurtas balsas"));
+    mic.setAttribute("aria-label", "Kalbėti balsu su " + (state.g === "vyras" ? "AIsčiu" : "AIste"));
+  }
+  function choose(k, v){
+    if (state[k] === v) return;
+    state[k] = v;
+    if (conv) { try { conv.endSession(); } catch(e) {} }
+    sid++; conv = null; connecting = null; pending = []; held = []; setVoiceUI(false); typing(false);
+    paint(); welcome();
+    try { window.history.replaceState(null, "", "?g=" + state.g + "&t=" + state.t + (EMBED ? "&embed=1" : "")); } catch(e) {}
+  }
+  document.querySelectorAll("[data-g]").forEach(function(b){ b.addEventListener("click", function(){ choose("g", b.dataset.g); }); });
+  document.querySelectorAll("[data-t]").forEach(function(b){ b.addEventListener("click", function(){ choose("t", b.dataset.t); }); });
+  paint(); welcome();
+  window.AISTIS = { send: send, state: state, history: function(){ return history; } };
 })();
 </script>
-<script src="grupes-search.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/@elevenlabs/convai-widget-embed@0.18.2/dist/index.js" async type="text/javascript"></script>
 </body>
 </html>

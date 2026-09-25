@@ -1,0 +1,268 @@
+<!doctype html>
+<html lang="lt">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<title>AIstis RA sistemoje</title>
+<meta name="description" content="Maketas: kaip AI asistentas AIstis atrodytų robotikosakademija.lt ir registracijos puslapyje, ir kaip klausimas pasiektų RA komandą.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@600;700;800&display=swap&subset=latin-ext" rel="stylesheet">
+<style>
+:root{
+  --ground:#FFFFFF; --surface:#F7F7F5; --ink:#0A0A0A; --muted:#595959; --line:#E5E2DE;
+  --red:#D90429; --red-soft:#FFF1F3; --bubble:#F1F0EE; --site:#1D3557; --site-soft:#EEF3F8;
+  --mono:'JetBrains Mono',ui-monospace,'SF Mono',Menlo,monospace;
+  --body:Inter,-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;
+  --r:4px;
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--ground);color:var(--ink);font-family:var(--body);font-size:17px;line-height:1.55}
+.wrap{max-width:1080px;margin:0 auto;padding:16px 16px 64px}
+h1,h2,.label{font-family:var(--mono);font-weight:800;letter-spacing:.04em}
+h1{font-size:clamp(24px,6vw,34px);line-height:1.2;margin:6px 0 6px}
+h1 .ai{color:var(--red)}
+h2{font-size:16px;text-transform:uppercase;letter-spacing:.08em;margin:0 0 4px}
+.label{font-size:12px;text-transform:uppercase;letter-spacing:.14em;color:var(--red)}
+.sub{color:var(--muted);margin:0 0 12px}
+.stamp{display:inline-block;font:800 12px/1 var(--mono);letter-spacing:.14em;color:var(--red);border:2px solid var(--red);padding:5px 8px;border-radius:var(--r);transform:rotate(-2deg);background:#fff}
+a{color:var(--red)}
+.back{display:inline-flex;min-height:44px;align-items:center;font-weight:700}
+section.mock{margin:28px 0 0;padding:16px 0 0;border-top:1px solid var(--line)}
+.mock-head{display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;margin-bottom:6px}
+.expl{color:var(--muted);font-size:15px;margin:0 0 12px}
+.grid{display:grid;gap:16px}
+@media(min-width:900px){.grid.two{grid-template-columns:1fr 1fr}}
+
+/* browser frame */
+.browser{border:1px solid #cfccc8;border-radius:10px;overflow:hidden;background:#fff;box-shadow:0 10px 30px rgba(0,0,0,.08);position:relative}
+.bar{display:flex;align-items:center;gap:6px;padding:8px 10px;background:#ECEAE7;border-bottom:1px solid #d9d6d2}
+.dots i{display:inline-block;width:9px;height:9px;border-radius:50%;background:#c9c5c0;margin-right:4px}
+.url{flex:1;min-width:0;background:#fff;border-radius:14px;padding:4px 10px;font:500 13px/1.3 var(--mono);color:#444;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.site{position:relative;height:640px;overflow:hidden;background:#fff}
+.site-nav{display:flex;align-items:center;justify-content:space-between;padding:12px 14px;border-bottom:1px solid var(--line)}
+.wordmark{font:800 14px/1.1 var(--mono);letter-spacing:.06em;color:var(--site);text-transform:uppercase}
+.wordmark small{display:block;font:600 10px/1.3 var(--body);letter-spacing:.04em;color:#6b7a8c;text-transform:none}
+.burger{width:26px;height:18px;border-top:3px solid var(--site);border-bottom:3px solid var(--site);position:relative}
+.burger::after{content:"";position:absolute;left:0;right:0;top:4.5px;border-top:3px solid var(--site)}
+.hero{padding:22px 14px;background:var(--site-soft)}
+.hero b{display:block;font:800 22px/1.2 var(--body);color:var(--site);margin-bottom:6px}
+.hero p{margin:0 0 12px;color:#394b5f;font-size:15px}
+.hero .cta{display:inline-block;background:var(--site);color:#fff;border-radius:var(--r);padding:10px 14px;font-weight:700;font-size:15px}
+.ph{margin:14px;display:grid;gap:10px}
+.ph div{height:64px;border-radius:6px;background:var(--surface);border:1px solid var(--line)}
+.launcher{position:absolute;right:14px;bottom:14px;width:60px;height:60px;border-radius:50%;background:var(--red);color:#fff;border:0;font:800 17px/1 var(--mono);box-shadow:0 6px 18px rgba(217,4,41,.35);cursor:pointer;z-index:3}
+.launcher-tip{position:absolute;right:84px;bottom:26px;background:var(--ink);color:#fff;font-size:13px;padding:6px 10px;border-radius:var(--r);z-index:3}
+.messenger{position:absolute;inset:0;z-index:4;background:#fff;display:none;flex-direction:column}
+.messenger.open{display:flex}
+.messenger iframe{flex:1;border:0;width:100%}
+.messenger .close{flex:0 0 36px;border:0;background:#2a2a2a;color:#fff;font:600 13px/1 var(--body);cursor:pointer;text-align:right;padding:0 12px}
+@media(min-width:560px){
+  .messenger{inset:auto 14px 86px auto;width:380px;height:540px;border-radius:12px;overflow:hidden;box-shadow:0 12px 40px rgba(0,0,0,.25)}
+}
+
+/* inbox */
+.inbox{border:1px solid #cfccc8;border-radius:10px;overflow:hidden;background:#fff;box-shadow:0 10px 30px rgba(0,0,0,.06)}
+.inbox-top{background:#1F1F1F;color:#fff;padding:10px 12px;font:700 14px/1.3 var(--mono);display:flex;justify-content:space-between;gap:8px}
+.inbox-top span{opacity:.75;font-weight:600}
+.tickets{display:grid}
+.ticket{padding:12px;border-bottom:1px solid var(--line);display:grid;gap:4px}
+.ticket.new{background:var(--red-soft);border-left:4px solid var(--red)}
+.trow{display:flex;justify-content:space-between;gap:8px;font-size:13px;color:var(--muted)}
+.ticket h3{margin:0;font:700 16px/1.3 var(--body)}
+.field{font-size:15px}
+.field b{display:block;font:700 11px/1.4 var(--mono);text-transform:uppercase;letter-spacing:.08em;color:var(--muted)}
+.pill{display:inline-block;font:700 11px/1.5 var(--mono);text-transform:uppercase;letter-spacing:.06em;padding:1px 6px;border-radius:var(--r);background:var(--ink);color:#fff}
+.pill.ok{background:#0B6E4F}
+.ticket.old{opacity:.6}
+
+/* registration mock */
+.reg-page{padding:12px;display:grid;gap:10px;background:#fff}
+.filters{display:flex;gap:6px;flex-wrap:wrap}
+.filters span{border:1px solid var(--line);border-radius:18px;padding:6px 10px;font-size:14px;background:var(--surface)}
+.filters span b{font-weight:700}
+.gcard{border:1px solid var(--line);border-radius:8px;padding:10px 12px;display:grid;gap:2px;font-size:15px;background:#fff}
+.gcard h4{margin:0;font:700 16px/1.3 var(--body)}
+.gcard .m{color:var(--muted);font-size:14px}
+.gcard .regbtn{margin-top:6px;display:flex;align-items:center;justify-content:center;min-height:44px;border-radius:var(--r);background:var(--site);color:#fff;font-weight:700;text-decoration:none}
+.gcard.hl{outline:3px solid var(--red);outline-offset:2px}
+.gcard.hl .regbtn{background:var(--red)}
+.assist{border:1px solid var(--line);border-radius:12px;overflow:hidden;background:#fff}
+.assist-head{display:flex;align-items:center;gap:8px;padding:8px 10px;background:var(--ink);color:#fff;font:800 14px/1.2 var(--mono)}
+.assist-head .av{width:30px;height:30px;border-radius:50%;background:var(--red);display:grid;place-items:center;font-size:12px}
+.assist-body{padding:10px;display:grid;gap:8px}
+.b{max-width:88%;padding:8px 11px;border-radius:14px;font-size:15px;line-height:1.45}
+.b.ai{background:var(--bubble);border-bottom-left-radius:4px;justify-self:start}
+.b.me{background:var(--red);color:#fff;border-bottom-right-radius:4px;justify-self:end}
+.callout{font:700 12px/1.3 var(--mono);color:var(--red);text-transform:uppercase;letter-spacing:.06em}
+
+/* flow */
+.flow{display:grid;gap:10px;justify-items:center}
+.node{width:min(100%,420px);border:2px solid var(--ink);border-radius:var(--r);padding:10px 12px;text-align:center;background:#fff}
+.node b{display:block;font:800 15px/1.3 var(--mono);letter-spacing:.03em}
+.node span{font-size:14px;color:var(--muted)}
+.node.ai{border-color:var(--red);background:var(--red-soft)}
+.node.human{background:var(--ink);color:#fff}
+.node.human span{color:#ddd}
+.arrow{font:800 20px/1 var(--mono);color:var(--red)}
+.branches{display:grid;gap:8px;width:min(100%,640px)}
+@media(min-width:640px){.branches{grid-template-columns:repeat(3,1fr)}}
+.branch{border:1px solid var(--line);border-radius:var(--r);padding:10px;background:var(--surface);font-size:14px;text-align:center}
+.branch b{display:block;font:700 14px/1.3 var(--body);margin-bottom:2px}
+.branch.go{border:2px solid var(--red);background:#fff}
+.need{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:12px 14px;font-size:15px}
+.need ul{margin:6px 0 0;padding-left:20px}
+footer{margin-top:32px;font-size:14px;color:var(--muted);border-top:1px solid var(--line);padding-top:14px}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <a class="back" href="./">← Atgal į bandymų aikštelę</a>
+  <div class="label">Maketas · v1.3 · pirmadienio pristatymui</div>
+  <h1>Kaip A<span class="ai">I</span>stis atrodytų Robotikos Akademijos sistemoje</h1>
+  <p class="sub">Trys vaizdai: svetainė, registracija ir kelias iki RA komandos. Tai MAKETAS: tikro Intercom ir ExoClass kodo čia nėra, logotipų nenaudojame. Pokalbis (a) dalyje veikia tikrai, tas pats kaip bandymų aikštelėje.</p>
+
+  <!-- a -->
+  <section class="mock" id="a" aria-labelledby="a-t">
+    <div class="mock-head"><h2 id="a-t">a · robotikosakademija.lt + RA komandos inbox</h2><span class="stamp">MAKETAS</span></div>
+    <p class="expl">Tėvas spaudžia raudoną mygtuką apačioje dešinėje. Pirmas atsako AIstis. Mygtukas „Kalbėti su žmogumi“ arba sudėtingas klausimas → dešinėje atsiranda užklausa RA komandai su santrauka, be asmens duomenų.</p>
+    <div class="grid two">
+      <div class="browser" id="site-a">
+        <div class="bar"><span class="dots"><i></i><i></i><i></i></span><span class="url">robotikosakademija.lt</span></div>
+        <div class="site">
+          <div class="site-nav"><div class="wordmark">Robotikos Akademija<small>būreliai · stovyklos · DUK · kontaktai</small></div><div class="burger" aria-hidden="true"></div></div>
+          <div class="hero"><b>Robotikos būreliai vaikams nuo 4 metų</b><p>Darželiuose, mokyklose ir robotikos centruose visoje Lietuvoje.</p><span class="cta">Registracija</span></div>
+          <div class="ph" aria-hidden="true"><div></div><div></div><div></div><div></div></div>
+          <span class="launcher-tip" id="tip">Klausimas? Parašykite AIsčiui</span>
+          <button class="launcher" id="launcher" type="button" aria-expanded="false" aria-controls="messenger">AI</button>
+          <div class="messenger" id="messenger">
+            <button class="close" id="close" type="button">Uždaryti ✕</button>
+            <iframe id="chat-frame" title="AIstis pokalbis" loading="lazy" allow="microphone"></iframe>
+          </div>
+        </div>
+      </div>
+      <div class="inbox" aria-label="RA komandos inbox maketas">
+        <div class="inbox-top">RA komandos inbox (Intercom) <span>Skaistės komanda</span></div>
+        <div class="tickets" id="tickets">
+          <article class="ticket new" id="ticket-live">
+            <div class="trow"><span class="pill">Nauja · iš AIsčio</span><span id="t-time">ką tik</span></div>
+            <h3 id="t-topic">Sąskaita</h3>
+            <div class="field"><b>Ką klausė</b><span id="t-q">Gavau spalio sąskaitą, ji per didelė. Pataisykit.</span></div>
+            <div class="field"><b>Ką AIstis atsakė</b><span id="t-a">Paaiškino, kad suma priklauso nuo užsiėmimų skaičiaus per mėnesį, atidirbimų ir pateisinimų. Sprendimo nedarė, parodė RA komandos kontaktus.</span></div>
+            <div class="field"><b>Santrauka</b><span id="t-s">Tėvas mano, kad spalio sąskaita per didelė, prašo patikrinti.</span></div>
+            <div class="field"><b>Asmens duomenys</b><span>Nėra. Tėvas prisistato pats, kai atsako komanda.</span></div>
+            <div class="trow"><span>Kanalas: pokalbis svetainėje</span><span id="t-src">pavyzdys</span></div>
+          </article>
+          <article class="ticket old">
+            <div class="trow"><span class="pill ok">Išspręsta</span><span>vakar</span></div>
+            <h3>Sutarties nutraukimas</h3>
+            <div class="field"><b>Santrauka</b>Nori nutraukti nuo kito mėnesio. AIstis paaiškino taisyklę (raštu, prieš 7 d.).</div>
+          </article>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- b -->
+  <section class="mock" id="b" aria-labelledby="b-t">
+    <div class="mock-head"><h2 id="b-t">b · bureliai.robotikosakademija.lt (registracija ExoClass)</h2><span class="stamp">MAKETAS</span></div>
+    <p class="expl">AIstis padeda išsirinkti grupę tiesiai registracijos puslapyje: paklausia miesto ir klasės, suranda grupę kataloge ir parodo, kur spausti „Registruotis“. Grupės duomenys tikri, iš viešo RA katalogo.</p>
+    <div class="browser">
+      <div class="bar"><span class="dots"><i></i><i></i><i></i></span><span class="url">bureliai.robotikosakademija.lt</span></div>
+      <div class="reg-page">
+        <div class="wordmark">Robotikos Akademija<small>Registracija į būrelius</small></div>
+        <div class="filters"><span>Miestas: <b>Utena</b></span><span>Klasė: <b>1</b></span><span>Diena: <b>penktadienis</b></span></div>
+        <div class="assist" aria-label="AIstis pagalbininkas registracijoje">
+          <div class="assist-head"><span class="av">AI</span>AIstis padeda išsirinkti</div>
+          <div class="assist-body" id="assist"></div>
+        </div>
+        <div id="reg-list" style="display:grid;gap:10px"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- c -->
+  <section class="mock" id="c" aria-labelledby="c-t">
+    <div class="mock-head"><h2 id="c-t">c · Kelias nuo tėvo iki žmogaus</h2></div>
+    <div class="flow" role="img" aria-label="Tėvas, tada AIstis pokalbyje, balsu arba telefonu; tada atsakymas iš DUK, grupių paieška ExoClass arba perdavimas; perdavimas eina į Intercom inbox ir Skaistės komandą.">
+      <div class="node"><b>Tėvas</b><span>svetainėje, registracijoje ar telefonu</span></div>
+      <div class="arrow">↓</div>
+      <div class="node ai"><b>AIstis</b><span>pokalbis tekstu · balsu · telefonu (vėliau)</span></div>
+      <div class="arrow">↓</div>
+      <div class="branches">
+        <div class="branch"><b>Atsakymas iš DUK</b>26 Aukšės atsakymai + viešas RA puslapis</div>
+        <div class="branch"><b>Grupių paieška</b>viešas ExoClass katalogas: vieta, laikas, kaina, vietos</div>
+        <div class="branch go"><b>Perdavimas žmogui</b>sąskaitos, nutraukimas, skundai, ko nežino</div>
+      </div>
+      <div class="arrow">↓</div>
+      <div class="node"><b>Intercom inbox</b><span>užklausa su tema ir santrauka, be asmens duomenų</span></div>
+      <div class="arrow">↓</div>
+      <div class="node human"><b>Skaistės komanda</b><span>atsako darbo dienomis 9:00–18:00</span></div>
+    </div>
+    <div class="need" style="margin-top:16px">
+      <b>Ko reikėtų tikram paleidimui</b>
+      <ul>
+        <li>RA sutikimas ir duomenų tvarkymo sutartis (DPA), prieš jungiant Intercom.</li>
+        <li>Intercom prieiga: užklausa su santrauka keliauja tiesiai į inbox (dabar tėvas mato kontaktus).</li>
+        <li>Skaistės komandos 30 min peržiūra: kas atsakyta gerai, kur AIstis turi perduoti anksčiau.</li>
+      </ul>
+    </div>
+  </section>
+
+  <footer>⚗️ Eksperimentinis prototipas, sukurtas su AI. Gali klysti, tad svarbius dalykus pasitikrinkite su RA komanda. Nemokamas. Maketas: tai ne tikras Robotikos Akademijos puslapis. Radote klaidą? <a href="mailto:kristijonas.vasiliauskas@gmail.com?subject=AIstis%20maketas">Parašykite</a>.</footer>
+</div>
+<script src="grupes-search.js"></script>
+<script>
+(function(){
+  "use strict";
+  function el(tag, attrs, text){ var n = document.createElement(tag); if (attrs) for (var k in attrs) n.setAttribute(k, attrs[k]); if (text != null) n.textContent = text; return n; }
+  // a: launcher opens the REAL chat (index.html?embed=1)
+  var m = document.getElementById("messenger"), f = document.getElementById("chat-frame"), l = document.getElementById("launcher");
+  function open(){ if (!f.src) f.src = "index.html?embed=1"; m.classList.add("open"); l.setAttribute("aria-expanded", "true"); document.getElementById("tip").style.display = "none"; }
+  function close(){ m.classList.remove("open"); l.setAttribute("aria-expanded", "false"); }
+  l.addEventListener("click", function(){ m.classList.contains("open") ? close() : open(); });
+  document.getElementById("close").addEventListener("click", close);
+  if (/[?&]open=1\b/.test(location.search)) open();
+  // live handoff → inbox ticket (same origin only)
+  window.addEventListener("message", function(e){
+    if (e.origin !== location.origin || !e.data || e.data.type !== "aistis-handoff") return;
+    var d = e.data;
+    document.getElementById("t-topic").textContent = d.tema || "Klausimas";
+    document.getElementById("t-q").textContent = d.klausimas || "(klausimo dar nebuvo, tėvas iškart paspaudė „Kalbėti su žmogumi“)";
+    document.getElementById("t-a").textContent = d.atsakymas || "(dar nieko neatsakė)";
+    document.getElementById("t-s").textContent = d.santrauka || "";
+    document.getElementById("t-time").textContent = new Date().toLocaleTimeString("lt-LT", {hour: "2-digit", minute: "2-digit"});
+    document.getElementById("t-src").textContent = "gyvai iš šio pokalbio";
+    var t = document.getElementById("ticket-live"); t.animate && t.animate([{background:"#FFD6DD"},{background:"#FFF1F3"}], {duration: 900});
+  });
+  // b: real catalogue data for Utena, 1st grade, Friday
+  fetch("grupes.json").then(function(r){ return r.json(); }).then(function(d){
+    var res = window.AisteSearch.search(d.groups, {miestas: "Utena", klase: 1, diena: "penktadienis"});
+    var day = (res.grupes_ta_diena || [])[0];
+    var others = window.AisteSearch.search(d.groups, {miestas: "Utena", klase: 1}).grupes || [];
+    var a = document.getElementById("assist");
+    a.appendChild(el("div", {"class":"b me"}, "Sūnus pirmokas, norėtume penktadieniais."));
+    if (day) {
+      a.appendChild(el("div", {"class":"b ai"}, "Utenoje pirmokams yra " + res.tinkamu_grupiu + " grupės, penktadieniais " + res.tinkamu_ta_diena + ": " + day.vieta + ", " + day.laikas + ", " + day.kaina + " Laisvų vietų skaičius keičiasi, tikslų matysite registruojantis. Pažymėjau grupę žemiau."));
+    }
+    var list = document.getElementById("reg-list");
+    var shown = [day].concat(others.filter(function(g){ return !day || g.vieta + g.laikas !== day.vieta + day.laikas; })).filter(Boolean).slice(0, 3);
+    shown.forEach(function(g, i){
+      var c = el("div", {"class":"gcard" + (i === 0 ? " hl" : "")});
+      if (i === 0) c.appendChild(el("span", {"class":"callout"}, "↓ AIstis rodo čia"));
+      c.appendChild(el("h4", null, g.vieta));
+      c.appendChild(el("span", {"class":"m"}, g.programa + " · " + g.trukme + " · " + g.amzius));
+      c.appendChild(el("span", null, g.laikas + " · " + g.kaina));
+      c.appendChild(el("span", {"class":"m"}, g.vietos === "PILNA" ? "Grupė pilna" : g.vietos));
+      c.appendChild(el("span", {"class":"regbtn"}, "Registruotis"));
+      list.appendChild(c);
+    });
+    list.appendChild(el("p", {"class":"m", style:"font-size:13px;color:#595959;margin:0"}, "Duomenys: viešas RA katalogas ExoClass, " + d.updated + ". Laisvos vietos keičiasi kasdien."));
+  });
+})();
+</script>
+</body>
+</html>
