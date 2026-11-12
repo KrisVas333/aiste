@@ -138,7 +138,7 @@ body.embed .chat{height:100vh;min-height:0;border:0;border-radius:0;box-shadow:n
       <div class="who"><b id="who-name">AIstis</b><span id="who-status">AI asistentas · atsako iš karto</span></div>
       <button type="button" class="human" id="human">Kalbėti su žmogumi</button>
     </header>
-    <div class="thread" id="thread" aria-live="polite"></div>
+    <div class="thread" id="thread" aria-live="polite" data-clarity-mask="true"></div>
     <div class="voicebar" id="voicebar"><span id="voice-status">🎙️ Jungiuosi…</span><button type="button" id="voice-stop">Baigti balsu</button></div>
     <div class="quick" id="quick" aria-label="Pavyzdiniai klausimai">
       <button type="button">Utenoje, sūnus pirmokas. Ar yra grupė penktadieniais?</button>
@@ -150,7 +150,7 @@ body.embed .chat{height:100vh;min-height:0;border:0;border-radius:0;box-shadow:n
     </div>
     <form class="composer" id="composer" autocomplete="off">
       <label class="visually-hidden" for="input">Jūsų žinutė</label>
-      <textarea id="input" rows="1" placeholder="Parašykite klausimą…" enterkeyhint="send"></textarea>
+      <textarea id="input" data-clarity-mask="true" rows="1" placeholder="Parašykite klausimą…" enterkeyhint="send"></textarea>
       <button type="button" class="round mic" id="mic" aria-pressed="false" aria-label="Kalbėti balsu" title="Kalbėti balsu">🎙️</button>
       <button type="submit" class="round send" id="send" aria-label="Siųsti" title="Siųsti">➤</button>
     </form>
