@@ -72,11 +72,14 @@
       return true;
     });
     var vq = norm(p.vieta || "");
-    if (vq) { var mv = m.filter(function (g) { return norm(g[1]).indexOf(vq) >= 0; }); if (mv.length) m = mv; }
+    var vietaNerasta = false;
+    if (vq) { var mv = m.filter(function (g) { return norm(g[1]).indexOf(vq) >= 0; }); if (mv.length) m = mv; else vietaNerasta = true; }
     var dk = p.diena ? dayKey(p.diena) : null;
     var md = dk ? m.filter(function (g) { return g[5].some(function (d) { return d[0] === dk; }); }) : m;
     function rank(g) { return (g[8] ? 2 : 0) + (g[9] ? 1 : 0); }
-    function pick(list, n) { return list.slice().sort(function (a, b) { return rank(a) - rank(b); }).slice(0, n).map(fmt); }
+    // bias gate 2026-11-12: catalogue order is alphabetical by venue, so the same venue owned slot 1 every time. Rotate by day: every venue gets its turn, and the answer stays stable within one day.
+    function rot(list) { if (!list.length) return list; var k = Math.floor(Date.now() / 864e5) % list.length; return list.slice(k).concat(list.slice(0, k)); }
+    function pick(list, n) { return rot(list).sort(function (a, b) { return rank(a) - rank(b); }).slice(0, n).map(fmt); }
     var daysAvail = {};
     m.forEach(function (g) { g[5].forEach(function (d) { daysAvail[d[0]] = 1; }); });
     var out = {
@@ -88,7 +91,7 @@
     if (dk) {
       out.ieskota_diena = DAY_NAME[dk];
       out.tinkamu_ta_diena = md.length;
-      out.grupes_ta_diena = md.slice(0, 3).map(fmt);
+      out.grupes_ta_diena = pick(md, 3);
       if (md.length === 0 || md.every(function (g) { return g[8]; })) out.kitos_dienos_pavyzdziai = pick(m.filter(function (g) { return md.indexOf(g) < 0; }), 3);
     } else {
       out.grupes = pick(m, 3);
@@ -96,7 +99,13 @@
     var shown = (out.grupes || out.grupes_ta_diena || []).length;
     out.santrauka = "Mieste " + city + " tinkamų grupių: " + m.length + " (su laisvomis vietomis: " + out.tinkamu_su_laisvomis_vietomis + ")" +
       (dk ? ", iš jų " + DAY_NAME[dk] + ": " + md.length : "") + ". Čia parodyta: " + shown + ".";
-    out.pastaba = "Pradėk nuo santraukos skaičiaus. Pasakyk daugiausia 2 iš šių grupių (replika iki 60 žodžių). Laiką ir kainą rašyk skaitmenimis tiksliai kaip čia. Jei tinkamu_grupiu daugiau nei pasakei: „Yra dar N, pasakykit dieną ar rajoną.“ Kodų neskaityk.";
+    out.pastaba = "Pradėk nuo santraukos skaičiaus. Pasakyk daugiausia 2 iš šių grupių (replika iki 60 žodžių). Kiekvienai grupei VISADA pasakyk jos vietos pavadinimą tiksliai kaip lauke „vieta“. Dieną, laiką ir kainą imk TIK iš tos pačios grupės laukų „laikas“ ir „kaina“, nesumaišyk grupių tarpusavyje, rašyk skaitmenimis tiksliai kaip čia. Jei tinkamų grupių daugiau nei pasakei: „Tai ne visos: iš viso tinka X grupių, pasakykit dieną ar rajoną.“, kur X = tinkamu_grupiu; nieko neatimk ir neskaičiuok. Kodų neskaityk.";
+    if (vietaNerasta) {
+      out.vieta_nerasta = true;
+      out.ieskota_vieta = p.vieta;
+      out.santrauka = "Vietoje „" + p.vieta + "“ kataloge grupės NĖRA. " + out.santrauka + " Tai KITOS to miesto vietos.";
+      out.pastaba = "PIRMA pasakyk atvirai: „Kataloge grupės vietoje " + p.vieta + " nematau.“ Tik tada pasiūlyk šias grupes kaip KITAS miesto vietas, kiekvienos vietą pavadink tiksliai kaip lauke „vieta“. Niekada nesakyk, kad grupė yra vietoje „" + p.vieta + "“. " + out.pastaba;
+    }
     return out;
   }
   var api = { search: search, findCity: findCity, norm: norm };
